@@ -9,10 +9,15 @@
 # Run 'pylint' on Python files for programming errors and helps enforcing
 # PEP8 coding standards.
 
-if `hash pylint > /dev/null 2>&1`; then
-    pylint -j 2 tests/scripts/generate_test_code.py --rcfile .pylint
-    pylint -j 2 tests/scripts/test_generate_test_code.py --rcfile .pylint
-    pylint -j 2 tests/scripts/mbedtls_test.py --rcfile .pylint
+# Find the installed version of Pylint. Installed as a distro package this can
+# be pylint3 and as a PEP egg, pylint. We prefer pylint over pylint3
+if type pylint >/dev/null 2>/dev/null; then
+    PYLINT=pylint
+elif type pylint3 >/dev/null 2>/dev/null; then
+    PYLINT=pylint3
 else
-    echo "$0: WARNING: 'pylint' not found! Skipping checks on Python files."
+    echo 'Pylint was not found.'
+    exit 1
 fi
+
+$PYLINT -j 2 scripts/*.py tests/scripts/*.py
